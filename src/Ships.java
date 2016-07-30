@@ -1,5 +1,3 @@
-package ships;
-
 import java.util.Scanner;
 
 //Type 0 = Aircraft carrier (Size 5 Quantity 1),
@@ -21,7 +19,7 @@ public class Ships {
 		this.initialPos = new int[2];
 		this.createShips();			   
 	}
-	public void createShips(){
+	public void createShips(){ //Assigns size and name to ship
 		if(this.type == 0){
 			this.name = "Aircraft Carrier";
 			this.size = 5;
@@ -43,14 +41,20 @@ public class Ships {
 			this.size = 1;
 		}
 		System.out.print(this.name + " Coord Y: ");
-		this.initialPos[0] = userInput.nextInt();
+		this.initialPos[0] = userInput.nextInt(); //Obtains coord Y
 		System.out.print(this.name + " Coord X: ");
-		this.initialPos[1] = userInput.nextInt();
+		this.initialPos[1] = userInput.nextInt(); //Obtains coord X
 	}
 	public String getName(){
 		return this.name;
 	}
 	public int[] getInitialPos(){
 		return this.initialPos;
+	}
+	public int getShipOrientation(){
+		return this.direction;
+	}
+	public int getShipSize(){
+		return this.size;
 	}
 }
