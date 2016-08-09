@@ -14,8 +14,7 @@ public class Ships {
 	Scanner userInput = new Scanner(System.in);
 									   	
 	public Ships(int t){               	
-		this.type = t;				   	
-		this.direction = 0;
+		this.type = t;
 		this.initialPos = new int[2];
 		this.createShips();			   
 	}
@@ -44,6 +43,8 @@ public class Ships {
 		this.initialPos[0] = userInput.nextInt(); //Obtains coord Y
 		System.out.print(this.name + " Coord X: ");
 		this.initialPos[1] = userInput.nextInt(); //Obtains coord X
+		System.out.print(this.name + " Direction (0 = Vertical, 1 = Horizontal): ");
+		this.direction = userInput.nextInt(); //Obtains direction
 	}
 	public String getName(){
 		return this.name;
