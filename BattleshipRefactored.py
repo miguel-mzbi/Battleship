@@ -10,12 +10,12 @@ def printGridCoord():
         for j in range(10):
             gridAux.append(str(i)+str(j))
         gridCoord.append(gridAux)
-    print"\n"
+    print("\n")
     for fila in gridCoord:
         for coord in fila:
-            print coord + "",
+            print (coord + "",)
         print
-    print"\n"
+    print("\n")
 
 
 
@@ -58,10 +58,10 @@ def coord(barco,j,auto):
             
             while (correcto1==False):
                 pregunta="\nEn que coordenadas quiere iniciar su barco de "+str(barco)+" de largo.\nEscriba en formato numerico xy.\n"
-                coords=raw_input(str(pregunta).translate(None, ",").translate(None, "'").translate(None, "(").translate(None, ")"))
+                coords=input(str(pregunta).translate(None, ",").translate(None, "'").translate(None, "(").translate(None, ")"))
                 
                 if len(list(coords))!=2:
-                    print "ESCRIBA UNA COORDENADA VALIDA"
+                    print ("ESCRIBA UNA COORDENADA VALIDA")
                 else:
                     list(coords)
                     coordx=(int(coords[0])+1)
@@ -74,7 +74,7 @@ def coord(barco,j,auto):
                     if ((drccn==0) or (drccn)==1):
                         correcto2=True
                     else:
-                        print "ESCRIBA UNA DIRECCION VALIDA"
+                        print ("ESCRIBA UNA DIRECCION VALIDA")
         
         if coordx<=4:
             if coordy<=4: #C2
@@ -153,18 +153,18 @@ def ponerBarco(barco,j,cuadrante,coordx,coordy,drccn,auto):
 
     else:
         if auto=="no":
-            print "Se repetira el proceso de insertar coordenada debido a\nuna colision de sus barcos. Pruebe otra coordenada."
+            print ("Se repetira el proceso de insertar coordenada debido a\nuna colision de sus barcos. Pruebe otra coordenada.")
         return False
 
 
 
 def prntGrid(j):
-    print "\n"
+    print ("\n")
     for fila in grid[j]:
         for coord in fila:
-            print coord + "",
-        print
-    print "\n"
+            print( coord + "",)
+        print()
+    print("\n")
 
 
 
@@ -176,11 +176,11 @@ def insertGrid(x,y,j):
 def errorNumerico(a):
     while True:
         try:
-            z=raw_input(a)
+            z=input(a)
             q=int(z)
             break
         except ValueError:
-            print "CARACTER INAVLIDO: Debe ser un numero"
+            print ("CARACTER INAVLIDO: Debe ser un numero")
     return z
 
 
@@ -234,7 +234,7 @@ def disparoIA(j):
                 coords=list(coords) 
                 coordx=(int(coords[0])+1)
                 coordy=(int(coords[1])+1)
-                print coordsIA
+                print (coordsIA)
                 aprobCoords=True
         verhorFull=[0,1,2,3]
         verhorA=[0,1,2]
@@ -293,7 +293,7 @@ def disparoIA(j):
             specialverhor==1
         else: #Todas las opciones ya que no esta en el borde
             n=random.randint(0,(3-numfalloverhor))
-            print n
+            print(n)
             
             verhorIA=verhorFull.pop(n)
             specilaverhor=0
@@ -314,7 +314,7 @@ def disparoIA(j):
 
         coords=str(coordx-1)+str(coordy-1)
         coordsIA.append(coords)
-        print coordsIA
+        print (coordsIA)
 
         
 
@@ -360,7 +360,7 @@ def disparoIA(j):
                     finbarco=2
 
             if finbarco==2:
-                print coords
+                print (coords)
                 finbarco=0
                 aprobCoords=False
                 while aprobCoords==False:
@@ -409,7 +409,7 @@ def disparoIA(j):
     if grid[j] [coordy] [coordx]=="~": #Tablero enemigo
         grid[j] [coordy] [coordx]="O"
 
-        print "La IA ha fallado"
+        print ("La IA ha fallado")
 
         if finbarco==1: #Si se equivoca cuando ya se habia equivocado 3 veces en la direccion, o cuando llega al fin del barco y el inicio era otro extremo, genera nuevas coordenadas
             finbarco+=1
@@ -422,14 +422,14 @@ def disparoIA(j):
             elif aciertosseguidosIA==1: #Si falla despues del primer acierto, se agrega un error al intentar hayar la direccion
                 numfalloverhor+=1
 
-        raw_input()
+        input()
         return True
 
     #Acierto
     elif grid[j] [coordy] [coordx]=="#": #Tablero enemigo
         grid[j] [coordy] [coordx]="X"   #Tablero enemigo
 
-        print"La IA a acertado"
+        print("La IA a acertado")
         
         aciertosseguidosIA+=1
         if aciertosseguidosIA==1: #Si es el primer acierto se guarda como la coordenada de primer acierto
@@ -442,14 +442,12 @@ def disparoIA(j):
             aciertosseguidosIA=0
             numfalloverhor=0
         
-        raw_input()
+        input()
         return True
     else:
         finbarco=1
         return False
     
-
-            
 
 def disparo(j):   
     try:
@@ -458,28 +456,28 @@ def disparo(j):
         coordx=(int(coords[0])+1)
         coordy=(int(coords[1])+1)
     except IndexError:
-        print "CARACTER INAVLIDO: Debe ser dos coordenadas"
+        print ("CARACTER INAVLIDO: Debe ser dos coordenadas")
         
     if len(coords)!=2:
-        print "ESCRIBA UNA COORDENADA VALIDA"
+        print ("ESCRIBA UNA COORDENADA VALIDA")
         return False
 
     #Fallo
     elif grid[j] [coordy] [coordx]=="~": #Tablero enemigo
         grid[j+1] [coordy] [coordx]="O" #Radar atacante
-        print "\n"*60
-        print "FALLO!"
+        print ("\n"*60)
+        print ("FALLO!")
         return True
     #Acierto
     elif grid[j] [coordy] [coordx]=="#": #Tablero enemigo
         grid[j] [coordy] [coordx]="X"   #Tablero enemigo
         grid[j+1] [coordy] [coordx]="X" #Radar atacante
-        print "\n"*60
-        print "ACIERTO!!!"
+        print ("\n"*60)
+        print ("ACIERTO!!!")
         return True
 
     else:
-        print "Ya habia disparado en este lugar!"
+        print ("Ya habia disparado en este lugar!")
         return False
 
 
@@ -498,9 +496,9 @@ grid=[0,1,2,3] #Item 0 = Mapa J1 || Item 1 = Radar J2 || Item 2 = Mapa J2 || Ite
 rep="si"
 
 while rep=="si":
-    print "Bienvenido! Programa creado por Miguel Angel Montoya y Elno Casiel Guerrero", " \n"*2
-    print "EN ESTE AVANCE SOLO FUNCIONA EL MODO CON DOS JUGADORES. EL MODO DE UN JUGADOR NO FUNCIONA CORRECTAMENTE(ERRORES CON AI EN DISPAROS)"
-    print "Este es un juego de batalla naval, similar al buscaminas", " \n"*2,"Este es el tablero de coordenadas"
+    print ("Bienvenido! Programa creado por Miguel Angel Montoya y Elno Casiel Guerrero", " \n"*2)
+    print ("EN ESTE AVANCE SOLO FUNCIONA EL MODO CON DOS JUGADORES. EL MODO DE UN JUGADOR NO FUNCIONA CORRECTAMENTE(ERRORES CON AI EN DISPAROS)")
+    print ("Este es un juego de batalla naval, similar al buscaminas", " \n"*2,"Este es el tablero de coordenadas")
 
     check=False
     while check==False:
@@ -508,41 +506,41 @@ while rep=="si":
         if ((AIJ=="1")or(AIJ=="2")):
             check=True
         else:
-            print "Ponga un numero valido"
+            print ("Ponga un numero valido")
 
     #Barcos J1
     j=0
     grid[j]=crearGrid()
-    autoBarco=raw_input("J1: Quiere que se acomoden sus barcos automaticamente?\nEscriba si o no. Si escribe no, usted los acomodara\n").lower()
+    autoBarco=input("J1: Quiere que se acomoden sus barcos automaticamente?\nEscriba si o no. Si escribe no, usted los acomodara\n").lower()
     if autoBarco=="si":
         barcos(j,"si")
     else:
         reacomodo="no"
         while reacomodo=="no":
             barcos(j,"no")
-            reacomodo=raw_input("J1: Esta seguro de esta colococacion?, escriba si o no\n")
+            reacomodo=input("J1: Esta seguro de esta colococacion?, escriba si o no\n")
             if reacomodo=="no":
                 grid[j]=crearGrid()
     prntGrid(j)
         
     #Con IA
     if AIJ=="1":
-        raw_input("J1: Escriba OK para comenzar")
+        input("J1: Escriba OK para comenzar")
         j=2
         grid[j]=crearGrid()
         barcos(j,"si")
 
     #Con humano
     elif AIJ=="2":
-        raw_input("Presione ENTER y asegurese de que el J2 este enfrente de la pantalla\n")
-        print "\n"*60
+        input("Presione ENTER y asegurese de que el J2 este enfrente de la pantalla\n")
+        print ("\n"*60)
     
         #BarcosJ2
-        raw_input("Presione ENTER")
-        print "\n"*60
+        input("Presione ENTER")
+        print ("\n"*60)
         j=2
         grid[j]=crearGrid()
-        autoBarco=raw_input("J2: Quiere que se acomoden sus barcos automaticamente?\nEscriba si o no. Si escribe no, usted los acomodara\n").lower()
+        autoBarco=input("J2: Quiere que se acomoden sus barcos automaticamente?\nEscriba si o no. Si escribe no, usted los acomodara\n").lower()
         if autoBarco=="si":
             barcos(j,"si")
         else:
@@ -550,14 +548,14 @@ while rep=="si":
             reacomodo="no"
             while reacomodo=="no":
                 barcos(j,"no")
-                reacomodo=raw_input("J2: Esta seguro de esta colococacion?, escriba si o no\n")
+                reacomodo=input("J2: Esta seguro de esta colococacion?, escriba si o no\n")
                 if reacomodo=="no":
                     grid[j]=crearGrid()
-        print"J2: Este es su tablero"
+        print("J2: Este es su tablero")
         prntGrid(j)
 
         ##
-        ADMIN=raw_input("Escriba OK y asegurese de que el J1 este enfrente de la pantalla\n") #Terminar ADMIN
+        ADMIN=input("Escriba OK y asegurese de que el J1 este enfrente de la pantalla\n") #Terminar ADMIN
         if ADMIN=="end":
                 for n,i in enumerate(grid[0]):
                     for m,j in enumerate(i):
@@ -565,9 +563,9 @@ while rep=="si":
                             grid[0][n][m]="X"
         ##
                             
-        print "\n"*60
-        raw_input("Presione ENTER")
-        print "\n"*60
+        print ("\n"*60)
+        input("Presione ENTER")
+        print ("\n"*60)
 
     grid[3]=crearGrid()
     grid[1]=crearGrid()
@@ -605,64 +603,64 @@ while rep=="si":
         J2=False
         
         if (numBarcos(2)!=0):
-            print "\n"*10+"J1   J1   J1   J1   J1   J1   J1   J1   J1   J1"
+            print("\n"*10+"J1   J1   J1   J1   J1   J1   J1   J1   J1   J1")
             j=2
-            print "Este es tu radar:"
+            print("Este es tu radar:")
             prntGrid(j+1)
-            print "Este es tu tablero:"
+            print("Este es tu tablero:")
             prntGrid(j-2)
 
             while J1==False:
                 J1=disparo(j)
 
-            print "Este es tu radar:"
+            print ("Este es tu radar:")
             prntGrid(j+1)
 
-            print "Este es tu tablero:"
+            print ("Este es tu tablero:")
             prntGrid(j-2)
             if AIJ=="2":
-                raw_input("Escriba OK y asegurese de que el J2 este enfrente de la pantalla.\n")
-                print "\n"*60
-                raw_input("Presione ENTER")
-                print "\n"*60
+                input("Escriba OK y asegurese de que el J2 este enfrente de la pantalla.\n")
+                print ("\n"*60)
+                input("Presione ENTER")
+                print ("\n"*60)
             
 
 
         if (numBarcos(0)!=0):
             j=0
             if AIJ=="2":
-                print "J2   J2   J2   J2   J2   J2   J2   J2   J2   J2"
+                print ("J2   J2   J2   J2   J2   J2   J2   J2   J2   J2")
                 
-                print "Este es tu radar:"
+                print ("Este es tu radar:")
                 prntGrid(j+1)
-                print "Este es tu tablero:"
+                print ("Este es tu tablero:")
                 prntGrid(j+2)
                 while J2==False:
                     J2=disparo(j)
 
-                print "Este es tu radar:"
+                print ("Este es tu radar:")
                 prntGrid(j+1)
 
-                print "Este es tu tablero:"
+                print ("Este es tu tablero:")
                 prntGrid(j+2)
-                raw_input("Escriba OK y asegurese de que el J1 este enfrente de la pantalla.\n")
-                print "\n"*60
-                raw_input("Presione ENTER")
-                print "\n"*60
+                input("Escriba OK y asegurese de que el J1 este enfrente de la pantalla.\n")
+                print ("\n"*60)
+                input("Presione ENTER")
+                print ("\n"*60)
             else:
                 while J2==False:
                     J2=disparoIA(j)
                     turnos+=1
-                    print turnos
+                    print (turnos)
 
                 
     if numBarcos(0)==0:
         if AIJ=="1":
-            print "La Inteligencia Artificial ha ganado!"
+            print ("La Inteligencia Artificial ha ganado!")
         else:
-            print "FELICIDADES J2, GANASTE!!!"
-            print " \n","J2"*100
+            print ("FELICIDADES J2, GANASTE!!!")
+            print (" \n","J2"*100)
     else:
-        print "FELICIDADES J1, GANASTE!!!"
-        print " \n","J1"*100
-    rep=raw_input("Quiere volver a jugar? Escriba si o no").lower()
+        print ("FELICIDADES J1, GANASTE!!!")
+        print (" \n","J1"*100)
+    rep=input("Quiere volver a jugar? Escriba si o no").lower()
