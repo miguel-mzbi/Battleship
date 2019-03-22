@@ -1,666 +1,421 @@
-#Proyecto Batalla Naval
-#Autores Miguel Angel Montoya y Elno Casiel Guerrero
+# pylint: disable=C0103
+# pylint: disable=C0301
+# pylint: disable=C0111
+
+# Project Battleship
+# Authors Miguel Angel Montoya & Elno Casiel Guerrero on April 2015
+# Refactored by Miguel Angel Montoya on March 2019
 
 import random
+import os
 
-def printGridCoord():
-    gridCoord=[]
-    for i in range(10):
-        gridAux=[]
+class Grid:
+    def __init__(self, mapType):
+        self.mapType = mapType # 0 = coords, 1 = map, 2 = radar
+        self.grid = [["~" for _ in range(10)] for _ in range(10)]
+        for i in range(10):
+            for j in range(10):
+                self.setCoord(i, j, str(i) + str(j) if mapType == 0 else "~")
+
+    def setCoord(self, i, j, val):
+        self.grid[j][i] = val
+
+    def getCoord(self, i, j):
+        return self.grid[j][i]
+
+    def placeShip(self, x, y, direction, length):
+        if direction == 0:
+            for yT in range(y, y+length):
+                self.setCoord(x, yT, "#")
+        else:
+            for xT in range(x, x+length):
+                self.setCoord(xT, y, "#")
+
+    def getShipSpacesRemaining(self):
+        counter = 0
         for j in range(10):
-            gridAux.append(str(i)+str(j))
-        gridCoord.append(gridAux)
-    print("\n")
-    for fila in gridCoord:
-        for coord in fila:
-            print (coord + "",)
-        print
-    print("\n")
+            for i in range(10):
+                if self.getCoord(i, j) == "#":
+                    counter += 1
+        return counter
 
-
-
-def crearGrid():
-    grid=[]
-    for i in range(11):
-        gridAux=[]
-        if i==0:
-            gridAux=[" ","0","1","2","3","4","5","6","7","8","9"]
-        else:
-            for j in range(11):
-                if j==0:
-                    gridAux.append(str(i-1))
+    def printGrid(self):
+        for j in range(-1, 10):
+            if j == -1:
+                if self.mapType == 0:
+                    print("y\\x 0  1  2  3  4  5  6  7  8  9")
                 else:
-                    gridAux.append("~")
-        grid.append(gridAux)
-    return grid
-
-
-        
-def barcos(j,auto):
-    for i in range(5,2,-1):
-        coord(i,j,auto)
-    for i in range(3,0,-1):
-        coord(i,j,auto)
-
-
-        
-def coord(barco,j,auto):
-    
-    aprobacion=False
-    while aprobacion==False:
-        if auto=="si":
-            coordx=random.randint(1,10)
-            coordy=random.randint(1,10)
-            drccn=random.randint(0,1) #drccn = direccion   1=horizontal 0=vertical
-        else:
-            correcto1=False
-            correcto2=False
-            
-            while (correcto1==False):
-                pregunta="\nEn que coordenadas quiere iniciar su barco de "+str(barco)+" de largo.\nEscriba en formato numerico xy.\n"
-                coords=input(str(pregunta).translate(None, ",").translate(None, "'").translate(None, "(").translate(None, ")"))
-                
-                if len(list(coords))!=2:
-                    print ("ESCRIBA UNA COORDENADA VALIDA")
-                else:
-                    list(coords)
-                    coordx=(int(coords[0])+1)
-                    coordy=(int(coords[1])+1)
-                    correcto1=True
-                    
-                while ((correcto2==False) and (correcto1==True)):
-                    drccn=errorNumerico("Escriba (1) si lo quiere vertical o (0) si lo quiere horizontal\n")
-                    drccn=int(drccn)
-                    if ((drccn==0) or (drccn)==1):
-                        correcto2=True
+                    print("y\\x 0 1 2 3 4 5 6 7 8 9")
+            else:
+                row = ""
+                for i in range(-1, 10):
+                    if i == -1:
+                        row += str(j) + "   "
                     else:
-                        print ("ESCRIBA UNA DIRECCION VALIDA")
-        
-        if coordx<=4:
-            if coordy<=4: #C2
-                
-                cuadrante=2
-                aprobacion=ponerBarco(barco,j,cuadrante,coordx,coordy,drccn,auto)
-                
-            elif coordy>4: #C3
+                        row += self.getCoord(i, j) + " "
+                print(row)
 
-                cuadrante=3
-                aprobacion=ponerBarco(barco,j,cuadrante,coordx,coordy,drccn,auto)
-                
-        else:
-            if coordy>4: #C4
-                
-                cuadrante=4
-                aprobacion=ponerBarco(barco,j,cuadrante,coordx,coordy,drccn,auto)
-                
-            elif coordy<=4: #C1
-                
-                cuadrante=1
-                aprobacion=ponerBarco(barco,j,cuadrante,coordx,coordy,drccn,auto)
-      
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.map = Grid(1)
+        self.radar = Grid(2)
 
+    def getShipsRemaining(self):
+        return self.map.getShipSpacesRemaining()
 
-def ponerBarco(barco,j,cuadrante,coordx,coordy,drccn,auto):
-    
-    q1=0    #q1 : x
-    q2=0    #q2 : y        #1=horizontal 0=vertical
+    def printMap(self):
+        self.map.printGrid()
 
-    if ((cuadrante==2) and (drccn==0)):
-        q2=1
-    elif ((cuadrante==2) and (drccn==1)):
-        q1=1
-    elif ((cuadrante==3) and (drccn==0)):
-        q2=1
-    elif ((cuadrante==3) and (drccn==1)):
-        q1=-1
-    elif ((cuadrante==4) and (drccn==0)):
-        q2=-1
-    elif ((cuadrante==4) and (drccn==1)):
-        q1=-1
-    elif ((cuadrante==1) and (drccn==0)):
-        q2=-1
-    elif ((cuadrante==1) and (drccn==1)):
-        q1=1
+    def printRadar(self):
+        self.radar.printGrid()
 
-    coordUsadasX=[]
-    coordUsadasY=[]
+    def printBoth(self):
+        print("Este es tu radar.")
+        self.printRadar()
+        print("Este es tu tablero.")
+        self.printMap()
 
-    for n in range(barco):    #1=horizontal 0=vertical
-        if drccn==1: 
+    def shipsSetup(self):
+        clearTerminal(self.name)
+        print(f"ASEGURATE QUE EL JUGADOR {self.name} ESTÁ VIENDO LA PANTALLA. ES SU TURNO DE ACOMODAR BARCOS.")
+        autoShips = checkInputText(f"J{self.name}: Quiere que se acomoden sus barcos automaticamente?\nSi escribe no, usted los acomodara (si/no): ", ["si", "no"]) == "si"
+        self.placeAllShips(autoShips)
+        clearTerminal(self.name)
+        self.printMap()
+        input("PRESIONE CUALQUIER TECLA PARA CONTINUAR... ")
 
-            if (grid[j][coordy+(n*q1)][coordx])=="#":
-                coordUsadasX=[]
-                coordUsadasY=[]
+    def placeAllShips(self, isRandom=False):
+        lengths = [5, 4, 3, 3, 2, 1]
+        for length in lengths:
+            if isRandom:
+                self.placeShipRandom(length)
             else:
-                coordUsadasX.append(coordx)
-                coordUsadasY.append(coordy+(n*q1))
+                self.placeShip(length)
 
-        elif drccn==0:
+    def placeShipRandom(self, length):
+        def getRandomCoords(length):
+            # Direction 0 = vertical, 1 = horizontal
+            direction = random.randint(0, 1)
+            # If ship is horizontal, leftmost coord for ship must be in range (0, 10-l) so the ship can fit
+            x = random.randint(0, 10-(length if direction == 1 else 1))
+            # If ship is vertical, upmost coord for ship must be in range (0, 10-l) so the ship can fit
+            y = random.randint(0, 10-(length if direction == 0 else 1))
+            return (x, y, direction)
 
-            if grid[j][coordy][coordx+(n*q2)]=="#":
-                coordUsadasX=[]
-                coordUsadasY=[]
+        x, y, direction = getRandomCoords(length)
+
+        available = False
+        while not available:
+            available = True
+            if direction == 0:
+                for yT in range(y, y+length):
+                    if self.map.getCoord(x, yT) != "~":
+                        available = False
+                        break
             else:
-                coordUsadasX.append(coordx+(n*q2))
-                coordUsadasY.append(coordy)
-                
-    if len(coordUsadasX)==barco:
-        for z in range(barco):
-            insertGrid(coordUsadasX[z],coordUsadasY[z],j)
-        if auto=="no":
-            prntGrid(j)
-        return True
+                for xT in range(x, x+length):
+                    if self.map.getCoord(xT, y) != "~":
+                        available = False
+                        break
+            if not available:
+                x, y, direction = getRandomCoords(length)
 
-    else:
-        if auto=="no":
-            print ("Se repetira el proceso de insertar coordenada debido a\nuna colision de sus barcos. Pruebe otra coordenada.")
-        return False
+        self.map.placeShip(x, y, direction, length)
 
-
-
-def prntGrid(j):
-    print ("\n")
-    for fila in grid[j]:
-        for coord in fila:
-            print( coord + "",)
+    def confirmShip(self, length, x, y, direction):
+        available = True
         print()
-    print("\n")
-
-
-
-def insertGrid(x,y,j):
-    grid[j][y][x]="#"
-
-
-
-def errorNumerico(a):
-    while True:
-        try:
-            z=input(a)
-            q=int(z)
-            break
-        except ValueError:
-            print ("CARACTER INAVLIDO: Debe ser un numero")
-    return z
-
-
-def numBarcos(j):
-    numBarc=0
-    for b,d in enumerate(grid[j]):
-        for m,w in enumerate(d):
-            if w=="#":
-                numBarc+=1
-    return numBarc
-
-
-
-def disparoIA(j):
-    global coordx #Ultima coordenada x usada por la IA
-    global coordy #Ultima coordenada y usada por la IA
-    global coordsIA #Variable que almacena todas las coordenadas xy usadas por IA
-    global coordIAxacierto #Variable que almacena primer coordenada x usada por IA en caso de acierto
-    global coordIAyacierto #Variable que almacena primer coordenada y usada por IA en caso de acierto
-    global verhorIA #Variable que almacena direccion en caso de acierto
-    global numfalloverhor#Variable que almacena cuantas veces se ha equivocado de direccion, solo puede ocurrir si es despues del primer acierto y el maximo numero es 3, ya que habria dado toda l avuelta
-    global primeraciertoIA #Variable que almacena si la IA acerto por primera vez. Usada para despues crear una direccion
-    global aciertosseguidosIA #Variable que almacena el numero de aciertos seguidos. En caso de ser mayor a 1, convierte el primer acierto en falso
-    global verhorA #Almacena opciones verhor (0,1,2)
-    global verhorB #Almacena opciones verhor (0,2,3)
-    global verhorC #Almacena opciones verhor (1,2,3)
-    global verhorD #Almacena opciones verhor (0,1,3)
-    global verhorZ #Almacena opciones verhor (1,2)
-    global verhorY #Almacena opciones verhor (2,3)
-    global verhorX #Almacena opciones verhor (0,3)
-    global verhorW #Almacena opciones verhor (0,1)
-    global verhorFull #Alamacena opciones verhor (0,1,2,3)
-    global verhornuevo #Almacena si se ha cambiado el sentido debido a fin del barco
-    global finbarco #Almacena si se ha llegado al fin del barco y hay que cambiar el sentido o si se ha llegado al fin del barco por segunda vez y hay que hacer nuevas coordenadas
-    global listabarcos #Lista de barcos existentes
-    global specialverhor #Almacena si se esta usando una direccion con rango especial
-
-    if ((aciertosseguidosIA==0)or(finbarco==2)):
-        aprobCoords=False
-        finbarco=0
-        while aprobCoords==False:
-            coords=random.randint(1,99)
-            if len(list(str(coords)))==1:
-                coords=("0"+str(coords))
-                
-            coords=(str(coords))
-            if coords in coordsIA:
-                aprobCoords=False
+        for t in range(y, y+length) if direction == 0 else range(x, x+length):
+            if direction == 0:
+                self.map.setCoord(x, t, "&")
             else:
-                coordsIA.append(coords)
-                coords=list(coords) 
-                coordx=(int(coords[0])+1)
-                coordy=(int(coords[1])+1)
-                print (coordsIA)
-                aprobCoords=True
-        verhorFull=[0,1,2,3]
-        verhorA=[0,1,2]
-        verhorB=[0,2,3]
-        verhorC=[1,2,3]
-        verhorD=[0,1,3]
-        verhorZ=[1,2]
-        verhorY=[2,3]
-        verhorX=[0,3]
-        verhorW=[0,1]
-            
-    
-    elif aciertosseguidosIA==1:
-        #Crear direccion y checar si no esta al borde
-        #0=Vertical arriba 1=Horizontal derecha 2=Vertical abajo 3=Horizontal izquierda
-
-
-        if ((coordIAxacierto==1)and (coordIAyacierto==1)): #Izquierda y arriba no existe
-            n=random.randint(0,(1-numfalloverhor)) 
-            verhorIA=verhorZ.pop(n)
-            specialverhor==2
-            
-        elif ((coordIAxacierto==10)and (coordIAyacierto==1)): #Derecha y arriba no existe
-            n=random.randint(0,(1-numfalloverhor)) 
-            verhorIA=verhorY.pop(n)
-            specialverhor==2
-              
-        elif ((coordIAxacierto==10)and (coordIAyacierto==10)): #Derecha y abajo no existe
-            n=random.randint(0,(1-numfalloverhor)) 
-            verhorIA=verhorX.pop(n)
-            specialverhor==2
-            
-        elif ((coordIAxacierto==1)and (coordIAyacierto==10)): #Izquierda y abajo no existe
-            n=random.randint(0,(1-numfalloverhor)) 
-            verhorIA=verhorW.pop(n)
-            specialverhor==2
-              
-        elif coordIAxacierto==1: #Horizontal izquierda no existe por estar hasta la izquierda del mapa          
-            verhorIA=random.randint(0,(2-numfalloverhor))
-            verhor=verhorA.pop(n)
-            specialverhor=1
-
-        elif coordIAxacierto==10: #Horizontal derecha no existe por estar hasta la derecha del mapa
-            n=random.randint(0,(2-numfalloverhor)) 
-            verhorIA=verhorB.pop(n)
-            specialverhor==1
-                
-        elif coordIAyacierto==1: #Vertical arriba no existe por estar hasta arriba del mapa
-            n=random.randint(0,(2-numfalloverhor)) 
-            verhorIa=verhorC.pop(n)
-            specialverhor==1
-                
-        elif coordIAyacierto==10: #Vertical abajo no existe por estar hasta abajo del mapa
-            n=random.randint(0,(2-numfalloverhor)) 
-            verhorIA=verhorD.pop(n)
-            specialverhor==1
-        else: #Todas las opciones ya que no esta en el borde
-            n=random.randint(0,(3-numfalloverhor))
-            print(n)
-            
-            verhorIA=verhorFull.pop(n)
-            specilaverhor=0
-
-
-        if verhorIA==0:
-            coordx=coordIAxacierto
-            coordy=coordIAyacierto-1
-        elif verhorIA==1:
-            coordx=coordIAxacierto+1
-            coordy=coordIAyacierto
-        elif verhorIA==2:
-            coordx=coordIAxacierto
-            coordy=coordIAyacierto+1
-        elif verhorIA==3:
-            coordx=coordIAxacierto-1
-            coordy=coordIAyacierto
-
-        coords=str(coordx-1)+str(coordy-1)
-        coordsIA.append(coords)
-        print (coordsIA)
-
-        
-
-    elif aciertosseguidosIA>1:
-        check=False
-        while check==False:
-            if (finbarco==0)or(verhornuevo==True):
-                if verhorIA==0:
-                    coordx=coordx
-                    coordy=coordy-1
-                elif verhorIA==1:
-                    coordx=coordx+1
-                    coordy=coordy
-                elif verhorIA==2:
-                    coordx=coordx
-                    coordy=coordy+1
-                elif verhorIA==3:
-                    coordx=coordx-1
-                    coordy=coordy
-            elif finbarco==1:
-
-                                
-                if verhorIA==0:
-                    verhorIA=2
-                    coordx=coordIAxacierto
-                    coordy=coordIAyacierto+1
-                elif verhorIA==1:
-                    verhorIA=3
-                    coordx=coordIAxacierto-1
-                    coordy=coordIAyacierto
-                elif verhorIA==2:
-                    verhorIA=0
-                    coordx=coordIAxacierto
-                    coordy=coordIAyacierto-1
-                elif verhorIA==3:
-                    verhorIA=1
-                    coordx=coordIAxacierto+1
-                    coordy=coordIAyacierto
-                verhornuevo=True
-                coords=str(coordx-1)+str(coordy-1)
-
-                if coords in coordsIA:
-                    finbarco=2
-
-            if finbarco==2:
-                print (coords)
-                finbarco=0
-                aprobCoords=False
-                while aprobCoords==False:
-                    coords=random.randint(1,99)
-                    if len(list(str(coords)))==1:
-                        coords=("0"+str(coords))
-                        
-                    coords=(str(coords))
-                    if coords in coordsIA:
-                        aprobCoords=False
-                    else:
-                        coords=list(coords)
-
-                        
-                        coordx=(int(coords[0])+1)
-                        coordy=(int(coords[1])+1)
-
-                        numfalloverhor=0
-                        aprobCoords=True
-                    
-                verhorFull=[0,1,2,3]
-                verhorA=[0,1,2]
-                verhorB=[0,2,3]
-                verhorC=[1,2,3]
-                verhorD=[0,1,3]
-                verhorZ=[1,2]
-                verhorY=[2,3]
-                verhorX=[0,3]
-                verhorW=[0,1]
-                            
-                            
-            if ((coordx==0)or(coordx==11)or(coordy==0)or(coordy==11)):
-                if verhornuevo==True:
-                    finbarco=2
+                self.map.setCoord(t, y, "&")
+        self.printMap()
+        available = checkInputText("Confirmar posición (si/no): ", ["si", "no"]) == "si"
+        if not available:
+            for t in range(y, y+length) if direction == 0 else range(x, x+length):
+                if direction == 0:
+                    self.map.setCoord(x, t, "~")
                 else:
-                    finbarco=1
+                    self.map.setCoord(t, y, "~")
+        return available
+
+    def placeShip(self, length):
+
+        clearTerminal(self.name)
+        self.printMap()
+
+        def getUserCoords(length):
+            print("\nSeleccione la coordenada inicial y dirección para el barco de tamaño", length, ".\nLos barcos crecen a la derecha o hacia abajo de la coordenada inicial.")
+            x = checkInputNumber("Por favor inserta la coordenada x: ", list(range(10)))
+            y = checkInputNumber("Por favor inserta la coordenada y: ", list(range(10)))
+            direction = checkInputNumber("Por favor selecciona la dirección (0 = Vertical/1 = Horizontal): ", list(range(2)))
+            return (x, y, direction)
+
+        x, y, direction = getUserCoords(length)
+
+        available = False
+        while not available:
+            available = True
+            if direction == 0:
+                for yT in range(y, y+length):
+                    if yT < 0 or yT > 9 or x < 0 or x > 9 \
+                        or self.map.getCoord(x, yT) != "~":
+                        available = False
+                        print("\nPor favor, elija una coordenada dónde el barco pueda ser colocado.")
+                        break
+
             else:
-                check=True
+                for xT in range(x, x+length):
+                    if xT < 0 or xT > 9 or y < 0 or y > 9 \
+                        or self.map.getCoord(xT, y) != "~":
+                        available = False
+                        print("\nPor favor, elija una coordenada dónde el barco pueda ser colocado.")
+                        break
 
-                
-        coords=str(coordx-1)+str(coordy-1)
-        coordsIA.append(coords)
+            # Confirm position
+            if available:
+                available = self.confirmShip(length, x, y, direction)
 
+            if not available:
+                x, y, direction = getUserCoords(length)
 
-    #Fallo
-    if grid[j] [coordy] [coordx]=="~": #Tablero enemigo
-        grid[j] [coordy] [coordx]="O"
+        self.map.placeShip(x, y, direction, length)
+        self.printMap()
 
-        print ("La IA ha fallado")
+    def shoot(self, otherPlayer):
+        print("\nSeleccione la coordenada para disparar.")
+        x = checkInputNumber("Por favor inserta la coordenada x: ", list(range(10)))
+        y = checkInputNumber("Por favor inserta la coordenada y: ", list(range(10)))
 
-        if finbarco==1: #Si se equivoca cuando ya se habia equivocado 3 veces en la direccion, o cuando llega al fin del barco y el inicio era otro extremo, genera nuevas coordenadas
-            finbarco+=1
-            listabarcos.remove(aciertosseguidosIA)
-            aciertosseguidosIA=0
-                
-        else:
-            if aciertosseguidosIA>=2: #Si falla pero habia acertado dos o mas veces, se considera que es el fin del barco, y se prueba en la direccion opuesta
-                finbarco=1
-            elif aciertosseguidosIA==1: #Si falla despues del primer acierto, se agrega un error al intentar hayar la direccion
-                numfalloverhor+=1
+        clearTerminal(self.name)
+        # Success
+        if otherPlayer.map.getCoord(x, y) == "#":
+            otherPlayer.map.setCoord(x, y, "X")
+            self.radar.setCoord(x, y, "X")
+            print("ACIERTO!")
+        elif otherPlayer.map.getCoord(x, y) == "X":
+            print("YA HABÍAS ACERTADO AHÍ!!")
+        else: # FAIL
+            self.radar.setCoord(x, y, "O")
+            print("FALLO!")
 
-        input()
-        return True
+class PlayerAI(Player):
+    def __init__(self, name):
+        super().__init__(name)
+        self.enemyFoundShips = []
+        self.usedCoords = []
+        # Either if looking for a ship on an area a shot was successful
+        self.isCompletingShip = False
+        self.currentFoundLength = 0
+        self.coordsCurrentFoundShip = []
+        self.currentDirection = -1
+        self.lastSuccessCoord = ()
 
-    #Acierto
-    elif grid[j] [coordy] [coordx]=="#": #Tablero enemigo
-        grid[j] [coordy] [coordx]="X"   #Tablero enemigo
+    def addCoord(self, x, y):
+        self.usedCoords.append((x, y))
 
-        print("La IA a acertado")
-        
-        aciertosseguidosIA+=1
-        if aciertosseguidosIA==1: #Si es el primer acierto se guarda como la coordenada de primer acierto
-            coordIAxacierto=coordx
-            coordIAyacierto=coordy
-        if (numfalloverhor==3): #Si ya se equivoco 3 veces en la direccion, y acierta resetea los errores de direccion y sigue probando
-            numfalloverhor=0
-        if aciertosseguidosIA==max(listabarcos): #Si los aciertos seguidos son iguales al barco mas grande que reste, genera nuevas coordenadas
-            listabarcos.remove(aciertosseguidosIA)
-            aciertosseguidosIA=0
-            numfalloverhor=0
-        
-        input()
-        return True
-    else:
-        finbarco=1
-        return False
-    
-
-def disparo(j):   
-    try:
-        coords=errorNumerico("coordenadas de disparo!: ")
-        list(coords)
-        coordx=(int(coords[0])+1)
-        coordy=(int(coords[1])+1)
-    except IndexError:
-        print ("CARACTER INAVLIDO: Debe ser dos coordenadas")
-        
-    if len(coords)!=2:
-        print ("ESCRIBA UNA COORDENADA VALIDA")
+    def hasUsedCoord(self, mx, my):
+        for x, y in self.usedCoords:
+            if x == mx and y == my:
+                return True
         return False
 
-    #Fallo
-    elif grid[j] [coordy] [coordx]=="~": #Tablero enemigo
-        grid[j+1] [coordy] [coordx]="O" #Radar atacante
-        print ("\n"*60)
-        print ("FALLO!")
-        return True
-    #Acierto
-    elif grid[j] [coordy] [coordx]=="#": #Tablero enemigo
-        grid[j] [coordy] [coordx]="X"   #Tablero enemigo
-        grid[j+1] [coordy] [coordx]="X" #Radar atacante
-        print ("\n"*60)
-        print ("ACIERTO!!!")
-        return True
+    def getRandomCoord(self):
+        coordsNotUsed = False
+        while not coordsNotUsed:
+            x = random.randint(0, 9)
+            y = random.randint(0, 9)
+            coordsNotUsed = not self.hasUsedCoord(x, y)
+        return (x, y)
 
-    else:
-        print ("Ya habia disparado en este lugar!")
-        return False
+    def shoot(self, otherPlayer):
 
+        def cleanFail(x, y):
+            self.radar.setCoord(x, y, "O")
+            otherPlayer.map.setCoord(x, y, "O")
+            print("FALLO DE LA IA!")
 
+        def cleanSuccess(x, y):
+            print("ACIERTO DE LA IA!")
+            otherPlayer.map.setCoord(x, y, "X")
+            self.radar.setCoord(x, y, "X")
+            self.lastSuccessCoord = (x, y)
+            self.isCompletingShip = True
 
-        
-#def funciondesconocida():
-    #for n,i in enumerate(grid):
-        #for m,j in enumerate(i):
-            #if j=="#":
-                #grid [n][m]="X"
+        def getNextCoordToTry():
+            lastX, lastY = self.lastSuccessCoord
+            # Direction unknown
+            if self.currentFoundLength == 1:
+                # Try left
+                if lastX > 0 and self.radar.getCoord(lastX-1, lastY) == "~":
+                    return (lastX-1, lastY)
+                # Try right
+                if lastX < 9 and self.radar.getCoord(lastX+1, lastY) == "~":
+                    return (lastX+1, lastY)
+                # Try up
+                if lastY > 0 and self.radar.getCoord(lastX, lastY-1) == "~":
+                    return (lastX, lastY-1)
+                # Try down
+                if lastY < 9 and self.radar.getCoord(lastX, lastY+1) == "~":
+                    return (lastX, lastY+1)
+                # Surrounded, found ship of length 1
+                self.isCompletingShip = False
+                self.enemyFoundShips.append(1)
+                return self.getRandomCoord()
+            # If there can be still a bigger ship
+            if self.currentFoundLength < 5:
+                # If direction is horizontal
+                if self.currentDirection == 1:
+                    minX, minY = min(self.coordsCurrentFoundShip, key=lambda x: x[0])
+                    maxX, maxY = max(self.coordsCurrentFoundShip, key=lambda x: x[0])
+                    # Try one smaller x
+                    if minX-1 >= 0 and self.radar.getCoord(minX-1, minY) == "~":
+                        return (minX-1, minY)
+                    # Try one bigger x
+                    if maxX+1 <= 9 and self.radar.getCoord(maxX+1, maxY) == "~":
+                        return (maxX+1, maxY)
+                # If direction is vertical
+                if self.currentDirection == 0:
+                    minX, minY = min(self.coordsCurrentFoundShip, key=lambda x: x[1])
+                    maxX, maxY = max(self.coordsCurrentFoundShip, key=lambda x: x[1])
+                    # Try one smaller y
+                    if minY-1 >= 0 and self.radar.getCoord(minX, minY-1) == "~":
+                        return (minX, minY-1)
+                    # Try one bigger y
+                    if maxY+1 <= 9 and self.radar.getCoord(maxX, maxY+1) == "~":
+                        return (maxX, maxY+1)
+            # Try elsewhere
+            self.enemyFoundShips.append(self.currentFoundLength)
+            self.isCompletingShip = False
+            return self.getRandomCoord()
 
+        clearTerminal(otherPlayer.name)
 
-
-#INICIA EL PROGRAMA   INICIA EL PROGRAMA   INICIA EL PROGRAMA   INICIA EL PROGRAMA   
-grid=[0,1,2,3] #Item 0 = Mapa J1 || Item 1 = Radar J2 || Item 2 = Mapa J2 || Item 3 = Radar J1
-rep="si"
-
-while rep=="si":
-    print ("Bienvenido! Programa creado por Miguel Angel Montoya y Elno Casiel Guerrero", " \n"*2)
-    print ("EN ESTE AVANCE SOLO FUNCIONA EL MODO CON DOS JUGADORES. EL MODO DE UN JUGADOR NO FUNCIONA CORRECTAMENTE(ERRORES CON AI EN DISPAROS)")
-    print ("Este es un juego de batalla naval, similar al buscaminas", " \n"*2,"Este es el tablero de coordenadas")
-
-    check=False
-    while check==False:
-        AIJ=errorNumerico("De cuantos jugadores humanos sera el juego? (1/2)\n")
-        if ((AIJ=="1")or(AIJ=="2")):
-            check=True
+        if not self.isCompletingShip:
+            x, y = self.getRandomCoord()
         else:
-            print ("Ponga un numero valido")
+            x, y = getNextCoordToTry()
 
-    #Barcos J1
-    j=0
-    grid[j]=crearGrid()
-    autoBarco=input("J1: Quiere que se acomoden sus barcos automaticamente?\nEscriba si o no. Si escribe no, usted los acomodara\n").lower()
-    if autoBarco=="si":
-        barcos(j,"si")
-    else:
-        reacomodo="no"
-        while reacomodo=="no":
-            barcos(j,"no")
-            reacomodo=input("J1: Esta seguro de esta colococacion?, escriba si o no\n")
-            if reacomodo=="no":
-                grid[j]=crearGrid()
-    prntGrid(j)
-        
-    #Con IA
-    if AIJ=="1":
-        input("J1: Escriba OK para comenzar")
-        j=2
-        grid[j]=crearGrid()
-        barcos(j,"si")
-
-    #Con humano
-    elif AIJ=="2":
-        input("Presione ENTER y asegurese de que el J2 este enfrente de la pantalla\n")
-        print ("\n"*60)
-    
-        #BarcosJ2
-        input("Presione ENTER")
-        print ("\n"*60)
-        j=2
-        grid[j]=crearGrid()
-        autoBarco=input("J2: Quiere que se acomoden sus barcos automaticamente?\nEscriba si o no. Si escribe no, usted los acomodara\n").lower()
-        if autoBarco=="si":
-            barcos(j,"si")
+        if not self.isCompletingShip:
+            if otherPlayer.map.getCoord(x, y) == "#":
+                cleanSuccess(x, y)
+                self.currentFoundLength = 1
+                self.coordsCurrentFoundShip = [(x, y)]
+            else: # FAIL
+                cleanFail(x, y)
         else:
-            printGridCoord()
-            reacomodo="no"
-            while reacomodo=="no":
-                barcos(j,"no")
-                reacomodo=input("J2: Esta seguro de esta colococacion?, escriba si o no\n")
-                if reacomodo=="no":
-                    grid[j]=crearGrid()
-        print("J2: Este es su tablero")
-        prntGrid(j)
-
-        ##
-        ADMIN=input("Escriba OK y asegurese de que el J1 este enfrente de la pantalla\n") #Terminar ADMIN
-        if ADMIN=="end":
-                for n,i in enumerate(grid[0]):
-                    for m,j in enumerate(i):
-                        if j=="#":
-                            grid[0][n][m]="X"
-        ##
-                            
-        print ("\n"*60)
-        input("Presione ENTER")
-        print ("\n"*60)
-
-    grid[3]=crearGrid()
-    grid[1]=crearGrid()
-
-    
-    #Disparos
-    coordx=0
-    coordy=0
-    coordsIA=[] #Variable que almacena todas las coordenadas xy usadas por la IA
-    coordIAxacierto=0 #Variable que almacena coordenada x usada por IA en caso de acierto
-    coordIAyacierto=0 #Variable que almacena coordenada y usada por IA en caso de acierto
-    verhorIA=0 #Variable que almacena direccion en caso de acierto
-    numfalloverhor=0#Variable que almacena cuantas veces se ha equivocado de direccion, solo puede ocurrir si es despues del primer acierto y el maximo numero es 3, ya que habria dado toda l avuelta
-    primeraciertoIA=False #Variable que almacena si la IA acerto por primera vez. Usada para despues crear una direccion
-    aciertosseguidosIA=0 #Variable que almacena el numero de aciertos seguidos. En caso de ser mayor a 1, convierte el primer acierto en falso
-    verhorA=[0,1,2] #Almacena opciones verhor (0,1,2)
-    verhorB=[0,2,3] #Almacena opciones verhor (0,2,3)
-    verhorC=[1,2,3] #Almacena opciones verhor (1,2,3)
-    verhorD=[0,1,3] #Almacena opciones verhor (0,1,3)
-    verhorZ=[1,2] #Almacena opciones verhor (1,2)
-    verhorY=[2,3] #Almacena opciones verhor (2,3)
-    verhorX=[0,3] #Almacena opciones verhor (0,3)
-    verhorW=[0,1] #Almacena opciones verhor (0,1)
-    verhorFull=[0,1,2,3] #Alamacena opciones verhor (0,1,2,3)
-    verhornuevo=False #Almacena si se ha cambiado el sentido debido a fin del barco
-    finbarco=0 #Almacena si se ha llegado al fin del barco y hay que cambiar el sentido o si se ha llegado al fin del barco por segunda vez y hay que hacer nuevas coordenadas
-    listabarcos=[1,2,3,3,4,5] #Lista de barcos existentes
-    specialverhor=False #Almacena si se esta usando una direccion con rango especial
-    turnos=0
-    
-
-    
-    while (numBarcos(0)!=0 and numBarcos(2)!=0):
-        J1=False
-        J2=False
-        
-        if (numBarcos(2)!=0):
-            print("\n"*10+"J1   J1   J1   J1   J1   J1   J1   J1   J1   J1")
-            j=2
-            print("Este es tu radar:")
-            prntGrid(j+1)
-            print("Este es tu tablero:")
-            prntGrid(j-2)
-
-            while J1==False:
-                J1=disparo(j)
-
-            print ("Este es tu radar:")
-            prntGrid(j+1)
-
-            print ("Este es tu tablero:")
-            prntGrid(j-2)
-            if AIJ=="2":
-                input("Escriba OK y asegurese de que el J2 este enfrente de la pantalla.\n")
-                print ("\n"*60)
-                input("Presione ENTER")
-                print ("\n"*60)
-            
-
-
-        if (numBarcos(0)!=0):
-            j=0
-            if AIJ=="2":
-                print ("J2   J2   J2   J2   J2   J2   J2   J2   J2   J2")
-                
-                print ("Este es tu radar:")
-                prntGrid(j+1)
-                print ("Este es tu tablero:")
-                prntGrid(j+2)
-                while J2==False:
-                    J2=disparo(j)
-
-                print ("Este es tu radar:")
-                prntGrid(j+1)
-
-                print ("Este es tu tablero:")
-                prntGrid(j+2)
-                input("Escriba OK y asegurese de que el J1 este enfrente de la pantalla.\n")
-                print ("\n"*60)
-                input("Presione ENTER")
-                print ("\n"*60)
+            # Only found 1
+            if self.currentFoundLength == 1:
+                #If success, infer direction
+                if otherPlayer.map.getCoord(x, y) == "#":
+                    cleanSuccess(x, y)
+                    self.currentDirection = 0 if self.lastSuccessCoord[0] - x == 0 else 1
+                    self.currentFoundLength = 2
+                    self.coordsCurrentFoundShip.append((x, y))
+                # Else, keep looking on surrounding places
+                else:
+                    cleanFail(x, y)
+            # Already found more than 1
             else:
-                while J2==False:
-                    J2=disparoIA(j)
-                    turnos+=1
-                    print (turnos)
+                #If success, continue direction
+                if otherPlayer.map.getCoord(x, y) == "#":
+                    cleanSuccess(x, y)
+                    self.currentFoundLength += 1
+                    self.coordsCurrentFoundShip.append((x, y))
+                # Else, keep looking on surrounding places
+                else:
+                    cleanFail(x, y)
 
-                
-    if numBarcos(0)==0:
-        if AIJ=="1":
-            print ("La Inteligencia Artificial ha ganado!")
-        else:
-            print ("FELICIDADES J2, GANASTE!!!")
-            print (" \n","J2"*100)
+        self.addCoord(x, y)
+
+def clearTerminal(playerName):
+    os.system('cls' if os.name == 'nt' else 'clear')
+    if playerName == 1:
+        print("J1\tJ1\tJ1\tJ1\tJ1\tJ1")
     else:
-        print ("FELICIDADES J1, GANASTE!!!")
-        print (" \n","J1"*100)
-    rep=input("Quiere volver a jugar? Escriba si o no").lower()
+        print("J2\tJ2\tJ2\tJ2\tJ2\tJ2")
+
+def checkInputNumber(text, options):
+    valid = False
+    while not valid:
+        res = input(text)
+        try:
+            res = int(res)
+            if res in options:
+                valid = True
+        except ValueError:
+            pass
+    return res
+
+def checkInputText(text, options):
+    valid = False
+    while not valid:
+        res = input(text).lower()
+        if res in options:
+            valid = True
+    return res
+
+
+#INICIA EL PROGRAMA   INICIA EL PROGRAMA   INICIA EL PROGRAMA   INICIA EL PROGRAMA
+if __name__ == "__main__":
+    clearTerminal(1)
+    player1 = Player(1)
+
+    playAgain = True
+    while playAgain:
+
+        print("Bienvenido! Programa creado por Miguel Angel Montoya y Elno Casiel Guerrero\nEste es un juego de batalla naval, donde puede jugar contra otro humano o una IA\n\nEste es el tablero del coordenadas:")
+        Grid(0).printGrid()
+
+        print()
+        isPlayerAI = checkInputText("Planea jugar contra una IA (si/no): ", ["si", "no"]) == "si"
+        player2 = PlayerAI(2) if isPlayerAI else Player(2)
+
+        # Player 1 ship setup
+        player1.shipsSetup()
+
+        if isPlayerAI:
+            clearTerminal(1)
+            print("ACOMODANDO BARCOS DE IA AUTOMATICAMENTE...")
+            player2.placeAllShips(True)
+        else:
+            player2.shipsSetup()
+
+        player1Turn = True
+        playerPlaying = None
+        playerOther = None
+        while player1.getShipsRemaining() > 0 and player2.getShipsRemaining() > 0:
+
+            if player1Turn:
+                playerPlaying = player1
+                playerOther = player2
+            else:
+                playerPlaying = player2
+                playerOther = player1
+
+            if not isPlayerAI:
+                clearTerminal(playerPlaying.name)
+                print(f"ASEGURATE QUE EL JUGADOR {playerPlaying.name} ESTÁ VIENDO LA PANTALLA. ES SU TURNO DE DISPARAR.")
+                input("PRESIONE CUALQUIER TECLA PARA CONTINUAR... ")
+                clearTerminal(playerPlaying.name)
+
+            if player1Turn or not isPlayerAI:
+                playerPlaying.printBoth()
+            playerPlaying.shoot(playerOther)
+
+            if player1Turn or not isPlayerAI:
+                playerPlaying.printBoth()
+                input("\nPRESIONE CUALQUIER TECLA PARA CONTINUAR... ")
+
+            if playerPlaying.getShipsRemaining() == 0:
+                print(f"VICTORIA DEL JUGADOR {playerPlaying.name}!")
+                clearTerminal(playerOther.name)
+                break
+
+            player1Turn = not player1Turn
+
+        playAgain = checkInputText("Desea jugar de nuevo? (si/no): ", ["si", "no"]) == "si"
+        if playAgain:
+            player1 = Player(1)
